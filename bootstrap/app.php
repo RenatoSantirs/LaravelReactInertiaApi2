@@ -8,6 +8,7 @@ use Illuminate\Foundation\Configuration\Middleware;
 use
     Illuminate\Http\Middleware\AddLinkHeadersForPreloadedAssets;
 use Illuminate\Console\Scheduling\Schedule;
+use Laravel\Sanctum\Http\Middleware\EnsureFrontendRequestsAreStateful;
 use Spatie\Permission\Exceptions\UnauthorizedException;
 use Spatie\Permission\Middleware\PermissionMiddleware;
 use Spatie\Permission\Middleware\RoleMiddleware;
@@ -22,7 +23,7 @@ return Application::configure(basePath: dirname(__DIR__))
     ->withMiddleware(function (Middleware $middleware) {
         $middleware->encryptCookies(except: ['appearance', 'sidebar_state']);
         $middleware->api(prepend: [
-            \Laravel\Sanctum\Http\Middleware\EnsureFrontendRequestsAreStateful::class,
+            EnsureFrontendRequestsAreStateful::class,
         ]); //middleware de Sanctum A
         $middleware->web(append: [
             HandleAppearance::class,

@@ -40,6 +40,17 @@ class RolePermissionSeeder extends Seeder
             Permission::firstOrCreate(['name' => $permission]);
         }
 
+        $streamsPermissions=[
+            'view streams',
+            'create streams',
+            'edit streams',
+            'delete streams'
+        ];
+
+        foreach ($streamsPermissions as $permission) {
+            Permission::firstOrCreate(['name'=> $permission]);
+        }
+
         // === Roles ===
         $admin   = Role::firstOrCreate(['name' => 'admin']);
         $gerente = Role::firstOrCreate(['name' => 'gerente']);
@@ -53,11 +64,15 @@ class RolePermissionSeeder extends Seeder
         // 👨‍💻 Gerente → solo ver y editar usuarios + contactos
         $gerente->syncPermissions([
             'view users', 'edit users','create users',
-            'view contacts', 'edit contacts','create contacts'
+            'view contacts', 'edit contacts','create contacts',
+            'view streams', 'edit streams','create streams',
         ]);
 
         // 👤 Usuario normal → ver y crear contactos
-        $user->syncPermissions(['view contacts', 'create contacts']);
+        $user->syncPermissions([
+        'view contacts','create contacts',
+        'view streams','create streams',
+        ]);
 
         // === Crear usuarios de ejemplo ===
 

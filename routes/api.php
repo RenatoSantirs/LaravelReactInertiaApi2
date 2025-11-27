@@ -3,7 +3,9 @@
 use App\Http\Controllers\Api\ContactApiController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Api\AuthController;
-use Illuminate\Http\Client\Request;
+use App\Http\Controllers\Api\StreamApiController;
+use App\Http\Controllers\Api\FoodApiController;
+use Illuminate\Http\Request;
 
 // Route::middleware('auth:sanctum')->apiResource('contacts', ContactApiController::class);
 
@@ -31,6 +33,8 @@ Route::post('/logout', [AuthController::class, 'logout'])->middleware('auth:sanc
 Route::post('/logout-all', [AuthController::class, 'logoutAll'])->middleware('auth:sanctum');
 
 
+Route::apiResource('/streams', StreamApiController::class);
+Route::apiResource('foods', FoodApiController::class);
 
 Route::middleware('auth:sanctum')->get('/me', function (Request $request) {
     return response()->json($request->user());

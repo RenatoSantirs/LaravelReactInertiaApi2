@@ -10,9 +10,9 @@ type User = {
     status: number;
 };
 
-interface EditProps {
-    user: User;
-}
+// interface EditProps {
+//     user: User;
+// }
 
 export default function Edit() {
     const { user } = usePage<{ user: User }>().props;
@@ -21,7 +21,7 @@ export default function Edit() {
         name: user.name || '',
         email: user.email || '',
         password: '',
-        roles: user.roles?.map((r) => r.name) || ['user'], // 👈 array de roles
+        roles: user.roles?.map((r) => r.name) || ['user'], 
         status: user.status ? 1 : 0, //estado activo
     });
 
