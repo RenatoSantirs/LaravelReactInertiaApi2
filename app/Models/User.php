@@ -35,7 +35,6 @@ class User extends Authenticatable
     protected $hidden = [
         'password',
         'remember_token',
-        'status' => 'boolean',
     ];
 
     /**
@@ -49,6 +48,7 @@ class User extends Authenticatable
             'email_verified_at' => 'datetime',
             'password' => 'hashed',
             'last_login_at' => 'datetime',
+            'status' => 'boolean',
         ];
     }
     public function contacts()
