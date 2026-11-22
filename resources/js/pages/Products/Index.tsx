@@ -1,6 +1,9 @@
 import AppLayout from '@/layouts/app-layout';
-import { Head, Link, useForm, usePage } from '@inertiajs/react';
 import { type BreadcrumbItem } from '@/types';
+import { Head, Link, useForm, usePage } from '@inertiajs/react';
+import { initMercadoPago, Wallet } from '@mercadopago/sdk-react';
+import axios from 'axios';
+import { useEffect, useState } from 'react';
 
 interface Product {
   id: number;
@@ -28,6 +31,19 @@ interface ProductsProps {
 }
 
 export default function Index() {
+  const [preferenceId, setPreferenceId] = useState<string | null>(null);
+  useEffect(() => {
+    initMercadoPago(import.meta.env.VITE_MP_PUBLIC_KEY);
+  }, []);
+
+  const [quantities, setQuantities] = useState<Record<number, number>>({});
+
+  const setQty = (id: number, value: number) => {
+    setQuantities((prev) => ({
+      ...prev,
+      [id]: Math.max(1, value),
+    }));
+  };
   const { products, filters } = usePage<ProductsProps>().props;
 
   const { data, setData, get } = useForm({
@@ -91,10 +107,7 @@ export default function Index() {
                   <td className="border p-2">${p.precio}</td>
                   <td className="border p-2">{p.stock}</td>
                   <td className="flex gap-2 border p-2">
-                    <Link
-                      href={`/products/${p.id}/edit`}
-                      className="rounded bg-orange-400 px-3 py-1 text-white hover:bg-orange-500"
-                    >
+                    <Link href={`/products/${p.id}/edit`} className="rounded bg-orange-400 px-3 py-1 text-white hover:bg-orange-500">
                       Editar
                     </Link>
                     <Link
@@ -108,6 +121,27 @@ export default function Index() {
                     >
                       Eliminar
                     </Link>
+                    <input
+                      type="number"
+                      min={1}
+                      max={p.stock}
+                      value={quantities[p.id] || 1}
+                      onChange={(e) => setQty(p.id, Number(e.target.value))}
+                      className="w-16 rounded border px-2"
+                    />
+                    <button
+                      onClick={() => {
+                        axios
+                          .post('/cart', {
+                            product_id: p.id,
+                            quantity: quantities[p.id] || 1,
+                          })
+                          .then(() => alert('Producto agregado al carrito'));
+                      }}
+                      className="rounded bg-green-600 px-3 py-1 text-white"
+                    >
+                      Agregar al carrito
+                    </button>
                   </td>
                 </tr>
               ))
@@ -121,6 +155,12 @@ export default function Index() {
           </tbody>
         </table>
 
+        {preferenceId && (
+          <div className="mt-6">
+            <h2 className="mb-2 text-lg font-bold">Completa tu pago</h2>
+            <Wallet initialization={{ preferenceId }} />
+          </div>
+        )}
         {/* 🔗 Paginación */}
         <div className="mt-4 flex gap-2">
           {products.links.map((link, i) => (

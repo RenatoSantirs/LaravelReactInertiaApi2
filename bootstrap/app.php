@@ -34,6 +34,9 @@ return Application::configure(basePath: dirname(__DIR__))
             'permission' => PermissionMiddleware::class,
             'role'       => RoleMiddleware::class,
         ]);
+        $middleware->validateCsrfTokens(except: [
+            'webhook/mercadopago',
+        ]);
     })
     ->withSchedule(function (Schedule $schedule) {
         // Aquí programas tus comandos

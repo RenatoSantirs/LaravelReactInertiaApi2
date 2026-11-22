@@ -4,6 +4,7 @@ namespace Database\Seeders;
 
 use Illuminate\Database\Seeder;
 use App\Models\User;
+use App\Enums\PermissionEnum;
 use Spatie\Permission\Models\Role;
 use Spatie\Permission\Models\Permission;
 use Illuminate\Support\Facades\Hash;
@@ -13,149 +14,86 @@ class RolePermissionSeeder extends Seeder
 {
     public function run(): void
     {
-        // 🚀 Limpiar cache
+        // 🚀 Limpiar cache de permisos
         app()[PermissionRegistrar::class]->forgetCachedPermissions();
 
-        // === Permisos de contactos ===
-        $contactPermissions = [
-            'view contacts',
-            'create contacts',
-            'edit contacts',
-            'delete contacts',
+        // === CREAR PERMISOS ===
+        $permissions = [
+            // Users
+            PermissionEnum::VIEW_USERS,
+            PermissionEnum::CREATE_USERS,
+            PermissionEnum::EDIT_USERS,
+            PermissionEnum::DELETE_USERS,
+
+            // Contacts
+            PermissionEnum::VIEW_CONTACTS,
+            PermissionEnum::CREATE_CONTACTS,
+            PermissionEnum::EDIT_CONTACTS,
+            PermissionEnum::DELETE_CONTACTS,
+
+            // Streams
+            PermissionEnum::VIEW_STREAMS,
+            PermissionEnum::CREATE_STREAMS,
+            PermissionEnum::EDIT_STREAMS,
+            PermissionEnum::DELETE_STREAMS,
         ];
 
-        foreach ($contactPermissions as $permission) {
+        foreach ($permissions as $permission) {
             Permission::firstOrCreate(['name' => $permission]);
         }
 
-        // === Permisos de usuarios ===
-        $userPermissions = [
-            'view users',
-            'create users',
-            'edit users',
-            'delete users',
-        ];
-
-        foreach ($userPermissions as $permission) {
-            Permission::firstOrCreate(['name' => $permission]);
-        }
-
-        $streamsPermissions=[
-            'view streams',
-            'create streams',
-            'edit streams',
-            'delete streams'
-        ];
-
-        foreach ($streamsPermissions as $permission) {
-            Permission::firstOrCreate(['name'=> $permission]);
-        }
-
-        // === Roles ===
+        // === ROLES ===
         $admin   = Role::firstOrCreate(['name' => 'admin']);
         $gerente = Role::firstOrCreate(['name' => 'gerente']);
         $user    = Role::firstOrCreate(['name' => 'user']);
 
-        // === Asignar permisos ===
+        // === ASIGNAR PERMISOS ===
 
-        // 🧑‍💼 Admin → todos los permisos
+        // 🧑‍💼 Admin → todos
         $admin->syncPermissions(Permission::all());
 
-        // 👨‍💻 Gerente → solo ver y editar usuarios + contactos
+        // 👨‍💻 Gerente
         $gerente->syncPermissions([
-            'view users', 'edit users','create users',
-            'view contacts', 'edit contacts','create contacts',
-            'view streams', 'edit streams','create streams',
+            PermissionEnum::VIEW_USERS,
+            PermissionEnum::CREATE_USERS,
+            PermissionEnum::EDIT_USERS,
+
+            PermissionEnum::VIEW_CONTACTS,
+            PermissionEnum::CREATE_CONTACTS,
+            PermissionEnum::EDIT_CONTACTS,
+
+            PermissionEnum::VIEW_STREAMS,
+            PermissionEnum::CREATE_STREAMS,
+            PermissionEnum::EDIT_STREAMS,
         ]);
 
-        // 👤 Usuario normal → ver y crear contactos
+        // 👤 Usuario normal
         $user->syncPermissions([
-        'view contacts','create contacts',
-        'view streams','create streams',
+            PermissionEnum::VIEW_CONTACTS,
+            PermissionEnum::CREATE_CONTACTS,
+
+            PermissionEnum::VIEW_STREAMS,
+            PermissionEnum::CREATE_STREAMS,
         ]);
 
-        // === Crear usuarios de ejemplo ===
+        // === USUARIOS DE PRUEBA ===
 
-        $u = User::firstOrCreate(
+        $adminUser = User::firstOrCreate(
             ['email' => 'admin1@admin.com'],
             ['name' => 'admin', 'password' => Hash::make('123456789')]
         );
-        $u->syncRoles(['admin']);
+        $adminUser->syncRoles(['admin']);
 
-        $g = User::firstOrCreate(
+        $gerenteUser = User::firstOrCreate(
             ['email' => 'gerente@gmail.com'],
             ['name' => 'gerente', 'password' => Hash::make('123456789')]
         );
-        $g->syncRoles(['gerente']);
+        $gerenteUser->syncRoles(['gerente']);
 
-        $u2 = User::firstOrCreate(
+        $normalUser = User::firstOrCreate(
             ['email' => 'user@gmail.com'],
             ['name' => 'user', 'password' => Hash::make('123456789')]
         );
-        $u2->syncRoles(['user']);
+        $normalUser->syncRoles(['user']);
     }
 }
-
-
-
-//SI ES SOLO EL ADMIN EL QUE ADMINISTRA USER
-// <?php
-
-// namespace Database\Seeders;
-
-// use Illuminate\Database\Seeder;
-// use App\Models\User;
-// use Spatie\Permission\Models\Role;
-// use Spatie\Permission\Models\Permission;
-// use Illuminate\Support\Facades\Hash;
-
-// class RolePermissionSeeder extends Seeder
-// {
-//     public function run(): void
-//     {
-//         // 🚀 Limpiar cache
-//         app()[\Spatie\Permission\PermissionRegistrar::class]->forgetCachedPermissions();
-
-//         // === Crear permisos (solo contactos, ya que users se manejan por rol) ===
-//         $permissions = [
-//             'view contacts',
-//             'create contacts',
-//             'edit contacts',
-//             'delete contacts',
-//         ];
-
-//         foreach ($permissions as $permission) {
-//             Permission::firstOrCreate(['name' => $permission]);
-//         }
-
-//         // === Crear roles ===
-//         $admin = Role::firstOrCreate(['name' => 'admin']);
-//         $user  = Role::firstOrCreate(['name' => 'user']);
-
-//         // === Asignar permisos ===
-//         // Admin tiene todos los permisos (contacts + cualquier otro futuro)
-//         $admin->syncPermissions(Permission::all());
-
-//         // User solo puede ver y crear contactos
-//         $user->syncPermissions(['view contacts', 'create contacts']);
-
-//         // === Crear usuarios de ejemplo ===
-//         $u = User::firstOrCreate(
-//             ['email' => 'admin1@admin.com'],
-//             [
-//                 'name' => 'admin',
-//                 'password' => Hash::make('123456789'),
-//             ]
-//         );
-//         $u->syncRoles(['admin']);
-
-//         $u2 = User::firstOrCreate(
-//             ['email' => 'user@gmail.com'],
-//             [
-//                 'name' => 'user',
-//                 'password' => Hash::make('123456789'),
-//             ]
-//         );
-//         $u2->syncRoles(['user']);
-//     }
-// }

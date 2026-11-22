@@ -16,7 +16,7 @@ class UserController extends Controller
 
     public function index(User $user)
     {
-        $this->authorize('view users', $user);
+        $this->authorize('viewAny', User::class);
         $users = User::with('roles')->get();
         return Inertia::render('Users/Index', compact('users'));
     }
