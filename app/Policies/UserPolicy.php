@@ -3,41 +3,32 @@
 namespace App\Policies;
 
 use App\Models\User;
+use App\Enums\PermissionEnum;
 
 class UserPolicy
 {
     public function viewAny(User $user): bool
     {
-        // // Solo el admin puede listar usuarios
-        // return $user->hasRole('admin');
-        return $user->can('view users');
-
+        return $user->can(PermissionEnum::VIEW_USERS);
     }
 
     public function view(User $user, User $model): bool
     {
-        // // Solo admin puede ver otros usuarios
-        // return $user->hasRole('admin');
-        return $user->can('view users');
-
+        return $user->can(PermissionEnum::VIEW_USERS);
     }
 
     public function create(User $user): bool
     {
-        // return $user->hasRole('admin');
-        return $user->can('create users');
-
+        return $user->can(PermissionEnum::CREATE_USERS);
     }
 
     public function update(User $user, User $model): bool
     {
-        // return $user->hasRole('admin');
-        return $user->can('edit users');
+        return $user->can(PermissionEnum::EDIT_USERS);
     }
 
     public function delete(User $user, User $model): bool
     {
-        // return $user->hasRole('admin');
-        return $user->can('delete users');
+        return $user->can(PermissionEnum::DELETE_USERS);
     }
 }

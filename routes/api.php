@@ -33,9 +33,23 @@ Route::post('/logout', [AuthController::class, 'logout'])->middleware('auth:sanc
 Route::post('/logout-all', [AuthController::class, 'logoutAll'])->middleware('auth:sanctum');
 
 
-Route::apiResource('/streams', StreamApiController::class);
-Route::apiResource('foods', FoodApiController::class);
+Route::middleware('auth:sanctum')->group(function () {
+    Route::apiResource('foods', FoodApiController::class);
+    Route::apiResource('streams', StreamApiController::class);
+});
 
 Route::middleware('auth:sanctum')->get('/me', function (Request $request) {
-    return response()->json($request->user());
+    return response()->json([
+        'user' => $request->user(),
+        'permissions' => $request->user()->getAllPermissions()->pluck('name'),
+    ]);
 });
+
+
+// use App\Http\Controllers\PaymentController;
+
+// Route::post('/payments/create', [PaymentController::class, 'createPayment']);
+
+// use App\Http\Controllers\WebhookController;
+
+// Route::post('/webhook/mercadopago', [WebhookController::class, 'handle']);

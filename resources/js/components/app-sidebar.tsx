@@ -16,18 +16,21 @@ interface User {
 }
 
 export function AppSidebar() {
-  // 👇 Obtener datos de usuario desde Inertia
+  // Obtener usuario desde Inertia
   const page = usePage<{ auth: { user: User } }>();
   const { auth } = page.props;
-  
-  // 👇 Chequear si el usuario es admin
-  // const isAdmin = auth?.user?.roles?.includes('admin');
 
-  // Chequear roles
+  // Roles
   const roles = auth?.user?.roles || [];
   const isAdminOrGerente = roles.includes('admin') || roles.includes('gerente');
 
+  // Navegación principal (usuarios normales)
   const mainNavItems: NavItem[] = [
+    {
+      title: 'Inicio',
+      href: '/inicio',
+      icon: LayoutGrid,
+    },
     {
       title: 'Dashboard',
       href: dashboard(),
@@ -39,33 +42,52 @@ export function AppSidebar() {
       icon: Folder,
     },
     {
-      title: 'Productos',
-      href: '/products',
-      icon: ShoppingCart,
-    },
-    {
       title: 'Alimentos',
       href: '/foods',
       icon: ShoppingCart,
     },
-
     {
       title: 'Streams',
       href: '/streams',
       icon: TvIcon,
     },
-
-    // 👇 Solo agregar Usuarios si es admin
-    ...(isAdminOrGerente
-      ? [
-          {
-            title: 'Usuarios',
-            href: '/users',
-            icon: Folder,
-          },
-        ]
-      : []),
+    {
+      title: 'Carrito',
+      href: '/cart',
+      icon: ShoppingCart,
+    },
+    {
+      title: 'Mis Compras',
+      href: '/mis-compras',
+      icon: ShoppingCart,
+    },
   ];
+
+  // Navegación solo para admin / gerente
+  const adminNavItems: NavItem[] = isAdminOrGerente
+    ? [
+        {
+          title: 'Usuarios',
+          href: '/users',
+          icon: Folder,
+        },
+        {
+          title: 'Productos',
+          href: '/products',
+          icon: ShoppingCart,
+        },
+        {
+          title: 'Orders',
+          href: '/orders',
+          icon: ShoppingCart,
+        },
+        {
+          title: 'Devoluciones',
+          href: '/returns',
+          icon: ShoppingCart,
+        },
+      ]
+    : [];
 
   const footerNavItems: NavItem[] = [
     {
@@ -95,7 +117,16 @@ export function AppSidebar() {
       </SidebarHeader>
 
       <SidebarContent>
+        {/* Menú normal */}
         <NavMain items={mainNavItems} />
+
+        {/* Sección Admin */}
+        {isAdminOrGerente && (
+          <>
+            <div className="mt-6 px-3 text-xs font-semibold text-muted-foreground uppercase">Admin options</div>
+            <NavMain items={adminNavItems} />
+          </>
+        )}
       </SidebarContent>
 
       <SidebarFooter>

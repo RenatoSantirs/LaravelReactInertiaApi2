@@ -15,7 +15,6 @@ class AuthController extends Controller
             'name'     => 'required',
             'email'    => 'required|email|unique:users',
             'password' => 'required|min:6',
-            'role'     => 'nullable|string|in:admin,user', // solo acepta admin o user
         ]);
 
         $user = User::create([
@@ -24,16 +23,13 @@ class AuthController extends Controller
             'password' => Hash::make($request->password),
         ]);
 
-        // Si no se envía rol, asignamos 'user' por defecto
-        $roleName = $request->role ?? 'user';
-
-        // Asignar rol con Spatie
-        $user->assignRole($roleName);
+        // Todo usuario que se registra por la API recibe el rol 'user'
+        $user->assignRole('user');
 
         return response()->json([
             'message' => 'Usuario creado correctamente',
             'user'    => $user,
-            'role'    => $roleName,
+            'role'    => 'user',
         ]);
     }
 
