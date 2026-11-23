@@ -14,11 +14,7 @@ class OrderPolicy
             return true;
         }
 
-        // Admin
-        if ($user->is_admin ?? false) {
-            return true;
-        }
-
-        return false;
+        // Admin (rol de Spatie)
+        return $user->hasRole('admin');
     }
 }
